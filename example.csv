@@ -1,0 +1,6 @@
+email,firstname,lastname,$language,points
+john.doe@example.com,John,Doe,fr,150
+jane.smith@example.com,Jane,Smith,en,230
+pierre.martin@example.com,Pierre,Martin,fr,180
+sarah.wilson@example.com,Sarah,Wilson,en,95
+marie.dubois@example.com,Marie,Dubois,fr,420

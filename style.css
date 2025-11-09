@@ -1,0 +1,444 @@
+/* Import Inter font (Batch.com style) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #FFFFFF;
+    min-height: 100vh;
+    padding: 40px 24px;
+    color: #0F0F0F;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 40px 0;
+}
+
+header h1 {
+    font-size: 40px;
+    font-weight: 700;
+    color: #0968AC;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+header p {
+    font-size: 18px;
+    color: #444649;
+    font-weight: 400;
+}
+
+/* Step sections */
+.step-section {
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 40px;
+    border: 2px solid #0F0F0F;
+    margin-bottom: 32px;
+    transition: all 0.3s ease;
+}
+
+.step-section.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.step-number {
+    width: 48px;
+    height: 48px;
+    background: #0968AC;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.step-header h2 {
+    color: #0968AC;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* Form elements */
+.form-group {
+    margin-bottom: 24px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #0F0F0F;
+    font-size: 15px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #E7F1FC;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+    background: #F7FBFE;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus {
+    outline: none;
+    border-color: #0968AC;
+    background: #FFFFFF;
+}
+
+input[type="checkbox"] {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-secondary,
+.btn-upload {
+    padding: 16px 36px;
+    border: none;
+    border-radius: 52px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-primary {
+    background: #0968AC;
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: #075F9E;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(9, 104, 172, 0.3);
+}
+
+.btn-secondary {
+    background: #FFFFFF;
+    color: #0968AC;
+    border: 2px solid #0968AC;
+    width: 100%;
+}
+
+.btn-secondary:hover {
+    background: #0968AC;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-upload {
+    background: #0968AC;
+    color: white;
+}
+
+.btn-upload:hover {
+    background: #075F9E;
+}
+
+/* Upload area */
+.upload-area {
+    border: 3px dashed #E7F1FC;
+    border-radius: 24px;
+    padding: 60px 40px;
+    text-align: center;
+    background: #F7FBFE;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: #0968AC;
+    background: #E7F1FC;
+}
+
+.upload-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.upload-area h3 {
+    color: #0968AC;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.upload-area p {
+    color: #444649;
+    margin-bottom: 24px;
+}
+
+/* File info */
+.file-info {
+    background: #F7FBFE;
+    border: 2px solid #E7F1FC;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.file-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.file-name {
+    font-weight: 600;
+    color: #0968AC;
+    font-size: 16px;
+}
+
+.file-size {
+    font-size: 14px;
+    color: #444649;
+}
+
+/* Loader */
+.loader {
+    text-align: center;
+    padding: 40px;
+    background: #F7FBFE;
+    border-radius: 16px;
+    margin-top: 24px;
+}
+
+.loader-spinner {
+    border: 4px solid #E7F1FC;
+    border-top: 4px solid #0968AC;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loader-message {
+    color: #444649;
+    font-weight: 500;
+}
+
+/* Status messages */
+.status-message {
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 24px;
+    font-weight: 500;
+}
+
+.status-message.success {
+    background: #D1FAE5;
+    border: 2px solid #10B981;
+    color: #065F46;
+}
+
+.status-message.error {
+    background: #FEE2E2;
+    border: 2px solid #EF4444;
+    color: #991B1B;
+}
+
+.status-message.warning {
+    background: #FEF3C7;
+    border: 2px solid #F59E0B;
+    color: #92400E;
+}
+
+/* Fields validation */
+#fields-validation {
+    background: #F7FBFE;
+    border: 2px solid #E7F1FC;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.field-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #E7F1FC;
+}
+
+.field-name {
+    font-weight: 600;
+    color: #0F0F0F;
+}
+
+.field-status {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.field-status.valid {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.field-status.warning {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.field-status.email {
+    background: #E7F1FC;
+    color: #0968AC;
+}
+
+/* Report cards */
+.report-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.report-card {
+    background: #F7FBFE;
+    border: 2px solid #E7F1FC;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+}
+
+.report-card-value {
+    font-size: 48px;
+    font-weight: 700;
+    color: #0968AC;
+    margin-bottom: 8px;
+}
+
+.report-card-label {
+    font-size: 14px;
+    color: #444649;
+    font-weight: 500;
+}
+
+.report-card.success .report-card-value {
+    color: #10B981;
+}
+
+.report-card.error .report-card-value {
+    color: #EF4444;
+}
+
+/* Report details */
+.report-details {
+    background: #F7FBFE;
+    border: 2px solid #E7F1FC;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.report-item {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid #E7F1FC;
+}
+
+.report-item.success {
+    border-left-color: #10B981;
+}
+
+.report-item.error {
+    border-left-color: #EF4444;
+}
+
+.report-item-email {
+    font-weight: 600;
+    color: #0F0F0F;
+    margin-bottom: 4px;
+}
+
+.report-item-message {
+    font-size: 14px;
+    color: #444649;
+}
+
+/* Utility classes */
+.hidden {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    body {
+        padding: 20px 16px;
+    }
+
+    header h1 {
+        font-size: 32px;
+    }
+
+    .step-section {
+        padding: 24px;
+    }
+
+    .upload-area {
+        padding: 40px 20px;
+    }
+
+    .file-info {
+        flex-direction: column;
+    }
+
+    .report-cards {
+        grid-template-columns: 1fr;
+    }
+}

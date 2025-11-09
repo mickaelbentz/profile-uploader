@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Profile Uploader</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Batch Profile Uploader</h1>
+            <p>Importez et synchronisez vos contacts avec Batch</p>
+        </header>
+
+        <!-- Étape 1: Configuration API -->
+        <div class="step-section" id="step-config">
+            <div class="step-header">
+                <span class="step-number">1</span>
+                <h2>Configuration de l'API</h2>
+            </div>
+
+            <div class="form-group">
+                <label for="api-key">API Key (REST API Key)</label>
+                <input type="password" id="api-key" placeholder="Votre clé API Batch">
+            </div>
+
+            <div class="form-group">
+                <label for="project-id">Project ID</label>
+                <input type="text" id="project-id" placeholder="project_xxxxxxxxxx">
+            </div>
+
+            <button class="btn-primary" id="load-profiles-btn">
+                Charger les profils existants
+            </button>
+
+            <div class="loader hidden" id="export-loader">
+                <div class="loader-spinner"></div>
+                <p id="loader-message">Chargement des profils existants...</p>
+            </div>
+
+            <div class="status-message hidden" id="export-status"></div>
+        </div>
+
+        <!-- Étape 2: Upload CSV -->
+        <div class="step-section disabled" id="step-upload">
+            <div class="step-header">
+                <span class="step-number">2</span>
+                <h2>Upload du fichier CSV</h2>
+            </div>
+
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">📄</div>
+                <h3>Glissez-déposez votre fichier CSV</h3>
+                <p>ou cliquez pour parcourir</p>
+                <input type="file" id="file-input" accept=".csv" hidden>
+                <button class="btn-upload" id="browse-btn">Parcourir les fichiers</button>
+            </div>
+
+            <div class="file-info hidden" id="file-info">
+                <div class="file-details">
+                    <span class="file-name" id="file-name"></span>
+                    <span class="file-size" id="file-size"></span>
+                </div>
+                <button class="btn-secondary" id="parse-btn">Analyser le fichier</button>
+            </div>
+        </div>
+
+        <!-- Étape 3: Validation des champs -->
+        <div class="step-section disabled" id="step-validation">
+            <div class="step-header">
+                <span class="step-number">3</span>
+                <h2>Validation des champs</h2>
+            </div>
+
+            <div id="fields-validation"></div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="update-strategy-merge" checked>
+                    Fusionner les attributs (conserver les valeurs existantes non présentes dans le CSV)
+                </label>
+                <label>
+                    <input type="checkbox" id="update-strategy-overwrite">
+                    Écraser tous les attributs (remplacer complètement les profils existants)
+                </label>
+            </div>
+
+            <button class="btn-primary" id="start-import-btn">
+                Lancer l'importation
+            </button>
+        </div>
+
+        <!-- Étape 4: Rapport d'importation -->
+        <div class="step-section disabled" id="step-report">
+            <div class="step-header">
+                <span class="step-number">4</span>
+                <h2>Rapport d'importation</h2>
+            </div>
+
+            <div class="report-cards" id="report-cards"></div>
+
+            <div class="report-details" id="report-details"></div>
+
+            <button class="btn-secondary" id="reset-btn">
+                Nouvelle importation
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
