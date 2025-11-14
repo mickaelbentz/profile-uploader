@@ -87,9 +87,19 @@ loadProfilesBtn.addEventListener('click', async () => {
             errorStack: error.stack,
             apiKeyPresent: !!apiKey,
             apiKeyLength: apiKey ? apiKey.length : 0,
-            apiKeyPreview: apiKey ? `${apiKey.substring(0, 10)}...` : 'vide',
+            apiKeyPreview: apiKey ? `${apiKey.substring(0, 15)}...` : 'vide',
+            apiKeyFormat: apiKey ? (apiKey.startsWith('rest_') ? 'REST API Key (correct)' : 'Format inattendu - doit commencer par "rest_"') : 'vide',
             projectId: projectId,
-            timestamp: new Date().toISOString()
+            projectIdFormat: projectId ? (projectId.startsWith('project_') ? 'Correct' : 'Format inattendu - doit commencer par "project_"') : 'vide',
+            timestamp: new Date().toISOString(),
+            requestDetails: {
+                url: 'https://api.batch.com/2.7/profiles/export',
+                method: 'POST',
+                headers: {
+                    'Authorization': apiKey ? `Bearer ${apiKey.substring(0, 15)}...` : 'vide',
+                    'X-Batch-Project': projectId
+                }
+            }
         });
     }
 });
@@ -111,13 +121,17 @@ async function requestProfilesExport() {
 
     if (!response.ok) {
         let errorDetails = `HTTP ${response.status} ${response.statusText}`;
+        let errorBody = null;
+
         try {
-            const error = await response.json();
-            errorDetails += ` - ${JSON.stringify(error)}`;
-            throw new Error(error.message || errorDetails);
+            errorBody = await response.json();
+            errorDetails += ` - ${JSON.stringify(errorBody)}`;
         } catch (e) {
-            throw new Error(errorDetails);
+            // La réponse n'est pas du JSON valide
+            errorDetails += ' - Impossible de parser la réponse';
         }
+
+        throw new Error(errorBody?.message || errorDetails);
     }
 
     const data = await response.json();
