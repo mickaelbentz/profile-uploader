@@ -37,8 +37,19 @@ const resetBtn = document.getElementById('reset-btn');
 
 // Fonction pour afficher les logs de debug
 function showDebugLog(logData) {
-    debugLogs.classList.remove('hidden');
-    debugContent.textContent = JSON.stringify(logData, null, 2);
+    console.log('=== AFFICHAGE DU DEBUG LOG ===');
+    console.log('debugLogs element:', debugLogs);
+    console.log('debugContent element:', debugContent);
+    console.log('logData:', logData);
+
+    if (debugLogs && debugContent) {
+        debugLogs.classList.remove('hidden');
+        debugContent.textContent = JSON.stringify(logData, null, 2);
+        console.log('Debug log affiché avec succès');
+    } else {
+        console.error('Éléments de debug manquants!');
+        alert('DEBUG: ' + JSON.stringify(logData, null, 2));
+    }
 }
 
 // === ÉTAPE 1: CHARGER LES PROFILS EXISTANTS ===
@@ -51,6 +62,9 @@ loadProfilesBtn.addEventListener('click', async () => {
         showStatus('error', 'Veuillez remplir l\'API Key et le Project ID');
         return;
     }
+
+    // Cacher le debug précédent
+    debugLogs.classList.add('hidden');
 
     try {
         exportLoader.classList.remove('hidden');
