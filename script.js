@@ -119,7 +119,7 @@ loadProfilesBtn.addEventListener('click', async () => {
 });
 
 async function requestProfilesExport() {
-    const response = await fetch('https://api.batch.com/2.7/profiles/export', {
+    const response = await fetch('https://api.batch.com/2.8/profiles/export', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${apiKey}`,
@@ -127,7 +127,7 @@ async function requestProfilesExport() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            format: 'json',
+            export_type: 'ATTRIBUTES',
             attributes: ['$email_address'],
             identifiers: ['custom_id']
         })
