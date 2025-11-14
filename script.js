@@ -107,7 +107,7 @@ loadProfilesBtn.addEventListener('click', async () => {
             projectIdFormat: projectId ? (projectId.startsWith('project_') ? 'Correct' : 'Format inattendu - doit commencer par "project_"') : 'vide',
             timestamp: new Date().toISOString(),
             requestDetails: {
-                url: 'https://api.batch.com/2.7/profiles/export',
+                url: 'https://api.batch.com/2.8/profiles/export',
                 method: 'POST',
                 headers: {
                     'Authorization': apiKey ? `Bearer ${apiKey.substring(0, 15)}...` : 'vide',
@@ -156,7 +156,7 @@ async function pollExportStatus(exportId, maxAttempts = 60) {
     for (let i = 0; i < maxAttempts; i++) {
         await sleep(5000); // Attendre 5 secondes entre chaque vérification
 
-        const response = await fetch(`https://api.batch.com/2.7/profiles/export/${exportId}`, {
+        const response = await fetch(`https://api.batch.com/2.8/profiles/export/${exportId}`, {
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
                 'X-Batch-Project': projectId
@@ -573,7 +573,7 @@ async function sendBatchUpdate(profiles) {
     // Enlever la propriété email temporaire avant d'envoyer
     const cleanProfiles = profiles.map(({ email, ...profile }) => profile);
 
-    const response = await fetch('https://api.batch.com/2.7/profiles/update', {
+    const response = await fetch('https://api.batch.com/2.8/profiles/update', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${apiKey}`,
