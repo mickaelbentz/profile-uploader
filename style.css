@@ -442,3 +442,31 @@ input[type="checkbox"] {
         grid-template-columns: 1fr;
     }
 }
+
+/* Debug logs */
+.debug-logs {
+    margin-top: 20px;
+    padding: 16px;
+    background: #FEF3C7;
+    border: 1px solid #F59E0B;
+    border-radius: 8px;
+}
+
+.debug-logs h4 {
+    margin: 0 0 12px 0;
+    color: #0F0F0F;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.debug-logs pre {
+    margin: 0;
+    padding: 12px;
+    background: #FFFFFF;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #444649;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}

@@ -12,6 +12,8 @@ const loadProfilesBtn = document.getElementById('load-profiles-btn');
 const exportLoader = document.getElementById('export-loader');
 const exportStatus = document.getElementById('export-status');
 const loaderMessage = document.getElementById('loader-message');
+const debugLogs = document.getElementById('debug-logs');
+const debugContent = document.getElementById('debug-content');
 
 const stepUpload = document.getElementById('step-upload');
 const uploadArea = document.getElementById('upload-area');
@@ -32,6 +34,12 @@ const stepReport = document.getElementById('step-report');
 const reportCards = document.getElementById('report-cards');
 const reportDetails = document.getElementById('report-details');
 const resetBtn = document.getElementById('reset-btn');
+
+// Fonction pour afficher les logs de debug
+function showDebugLog(logData) {
+    debugLogs.classList.remove('hidden');
+    debugContent.textContent = JSON.stringify(logData, null, 2);
+}
 
 // === ÉTAPE 1: CHARGER LES PROFILS EXISTANTS ===
 
@@ -70,7 +78,19 @@ loadProfilesBtn.addEventListener('click', async () => {
 
     } catch (error) {
         exportLoader.classList.add('hidden');
+        console.error('Détails de l\'erreur:', error);
         showStatus('error', `Erreur: ${error.message}`);
+
+        // Afficher les détails complets visibles dans l'interface
+        showDebugLog({
+            errorMessage: error.message,
+            errorStack: error.stack,
+            apiKeyPresent: !!apiKey,
+            apiKeyLength: apiKey ? apiKey.length : 0,
+            apiKeyPreview: apiKey ? `${apiKey.substring(0, 10)}...` : 'vide',
+            projectId: projectId,
+            timestamp: new Date().toISOString()
+        });
     }
 });
 
@@ -90,8 +110,14 @@ async function requestProfilesExport() {
     });
 
     if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Erreur lors de la demande d\'export');
+        let errorDetails = `HTTP ${response.status} ${response.statusText}`;
+        try {
+            const error = await response.json();
+            errorDetails += ` - ${JSON.stringify(error)}`;
+            throw new Error(error.message || errorDetails);
+        } catch (e) {
+            throw new Error(errorDetails);
+        }
     }
 
     const data = await response.json();
