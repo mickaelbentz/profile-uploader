@@ -34,6 +34,26 @@ const stepReport = document.getElementById('step-report');
 const reportCards = document.getElementById('report-cards');
 const reportDetails = document.getElementById('report-details');
 const resetBtn = document.getElementById('reset-btn');
+const toggleLogsBtn = document.getElementById('toggle-logs-btn');
+const logsContent = document.getElementById('logs-content');
+const technicalLogsText = document.getElementById('technical-logs-text');
+
+// Stockage des logs techniques
+let importLogs = [];
+
+function addLog(message, type = 'info') {
+    const timestamp = new Date().toISOString();
+    importLogs.push({ timestamp, type, message });
+    console.log(`[${type.toUpperCase()}] ${message}`);
+}
+
+// Toggle logs techniques
+toggleLogsBtn.addEventListener('click', () => {
+    logsContent.classList.toggle('hidden');
+    toggleLogsBtn.textContent = logsContent.classList.contains('hidden')
+        ? '📋 Afficher les logs techniques'
+        : '📋 Masquer les logs techniques';
+});
 
 // Fonction pour afficher les logs de debug
 function showDebugLog(logData) {
@@ -85,6 +105,7 @@ loadProfilesBtn.addEventListener('click', async () => {
         await downloadAndProcessExport(exportData);
 
         exportLoader.classList.add('hidden');
+        debugLogs.classList.add('hidden'); // Masquer le debug en cas de succès
         showStatus('success', `✓ ${existingProfiles.size} profils chargés avec succès!`);
 
         // Activer l'étape 2
@@ -156,7 +177,7 @@ async function pollExportStatus(exportId, maxAttempts = 60) {
     for (let i = 0; i < maxAttempts; i++) {
         await sleep(5000); // Attendre 5 secondes entre chaque vérification
 
-        const response = await fetch(`https://api.batch.com/2.8/profiles/export/${exportId}`, {
+        const response = await fetch(`https://api.batch.com/2.8/exports/view?id=${exportId}`, {
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
                 'X-Batch-Project': projectId
@@ -164,18 +185,27 @@ async function pollExportStatus(exportId, maxAttempts = 60) {
         });
 
         if (!response.ok) {
-            throw new Error('Erreur lors de la vérification du statut d\'export');
+            let errorDetails = `HTTP ${response.status}`;
+            try {
+                const errorBody = await response.json();
+                errorDetails += ` - ${JSON.stringify(errorBody)}`;
+            } catch (e) {
+                errorDetails += ` - ${response.statusText}`;
+            }
+            throw new Error(`Erreur lors de la vérification du statut d'export: ${errorDetails}`);
         }
 
         const data = await response.json();
 
-        if (data.status === 'done') {
+        console.log(`[Polling tentative ${i + 1}] Statut reçu:`, data.status, 'Données complètes:', data);
+
+        if (data.status === 'done' || data.status === 'SUCCESS') {
             return data;
-        } else if (data.status === 'failed') {
-            throw new Error('L\'export a échoué');
+        } else if (data.status === 'failed' || data.status === 'ERROR') {
+            throw new Error(`L'export a échoué: ${JSON.stringify(data)}`);
         }
 
-        loaderMessage.textContent = `Export en cours... (tentative ${i + 1}/${maxAttempts})`;
+        loaderMessage.textContent = `Export en cours (${data.status})... (tentative ${i + 1}/${maxAttempts})`;
     }
 
     throw new Error('Timeout: l\'export a pris trop de temps');
@@ -266,6 +296,13 @@ function handleFileSelect(file) {
     window.selectedFile = file;
 }
 
+function resetFileUpload() {
+    fileInfo.classList.add('hidden');
+    uploadArea.classList.remove('hidden');
+    fileInput.value = '';
+    window.selectedFile = null;
+}
+
 parseBtn.addEventListener('click', () => {
     if (!window.selectedFile) return;
 
@@ -284,6 +321,7 @@ function parseCSV(text) {
 
     if (lines.length < 2) {
         alert('Le fichier CSV doit contenir au moins un en-tête et une ligne de données');
+        resetFileUpload();
         return;
     }
 
@@ -299,6 +337,7 @@ function parseCSV(text) {
 
     if (emailIndex === -1) {
         alert('Le fichier CSV doit contenir une colonne "email" ou "$email_address"');
+        resetFileUpload();
         return;
     }
 
@@ -421,6 +460,10 @@ startImportBtn.addEventListener('click', async () => {
 });
 
 async function performImport(overwrite) {
+    importLogs = []; // Reset logs
+    addLog(`Début de l'importation - Mode: ${overwrite ? 'Écrasement' : 'Fusion'}`, 'info');
+    addLog(`Nombre de profils à traiter: ${csvData.length}`, 'info');
+
     const results = {
         created: 0,
         updated: 0,
@@ -625,6 +668,11 @@ function displayResults(results) {
     });
 
     reportDetails.innerHTML = detailsHTML;
+
+    // Afficher les logs techniques
+    technicalLogsText.textContent = importLogs.map(log =>
+        `[${log.timestamp}] [${log.type.toUpperCase()}] ${log.message}`
+    ).join('\n');
 }
 
 // Reset
