@@ -42,15 +42,34 @@ cd batch-profile-uploader
 
 ## ▶️ Étape 3 : Lancer l'application
 
-### Sur Mac/Linux
+### Sur Mac
 
-1. Double-clique sur le fichier **`start.sh`**
-2. Ton navigateur s'ouvrira automatiquement sur `http://localhost:8080`
-3. C'est prêt ! 🎉
+**Méthode simple (double-clic) :**
 
-**Si le double-clic ne marche pas :**
+1. Double-clique sur le fichier **`start.command`**
+2. Si tu vois un message "impossible d'ouvrir car provenant d'un développeur non identifié" :
+   - Clic droit sur `start.command`
+   - Sélectionne **"Ouvrir"**
+   - Clique sur **"Ouvrir"** dans la fenêtre de confirmation
+3. Ton navigateur s'ouvrira automatiquement sur `http://localhost:8080`
+4. C'est prêt ! 🎉
+
+**Méthode alternative (terminal) :**
 ```bash
 # Ouvre un terminal dans le dossier, puis :
+chmod +x start.sh
+./start.sh
+```
+
+### Sur Linux
+
+1. Ouvre un terminal dans le dossier
+2. Tape : `./start.sh`
+3. Ton navigateur s'ouvrira automatiquement sur `http://localhost:8080`
+4. C'est prêt ! 🎉
+
+**Si tu as une erreur de permission :**
+```bash
 chmod +x start.sh
 ./start.sh
 ```
