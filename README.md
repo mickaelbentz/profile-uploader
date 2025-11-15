@@ -316,10 +316,29 @@ L'application affiche des **logs de debug** uniquement en cas d'erreur :
 
 ## Limites et contraintes
 
-- **Maximum 10 000 profils** par fichier CSV (recommandé pour éviter les timeouts)
-- **Export initial** peut prendre plusieurs minutes si vous avez beaucoup de profils
-- **Rate limits Batch** : L'application respecte automatiquement les limites
-- **Taille fichier** : Pas de limite technique mais privilégiez < 5 MB pour de meilleures performances
+### Taille de la base de profils existants
+
+L'application doit d'abord exporter tous vos profils existants pour détecter les doublons :
+
+- ✅ **0 - 100 000 profils** : Export rapide (< 2 minutes)
+- ⚠️ **100 000 - 1 000 000 profils** : Export plus long (5-30 minutes selon la taille)
+- ⚠️ **> 1 000 000 profils** : Possible mais peut être très long (> 30 minutes)
+
+**Timeout configuré** : 30 minutes maximum pour l'export initial
+
+### Taille du fichier CSV à importer
+
+- ✅ **< 10 000 profils** : Import rapide (< 1 minute)
+- ✅ **10 000 - 50 000 profils** : Import moyen (2-5 minutes)
+- ⚠️ **50 000 - 200 000 profils** : Import long (10-20 minutes)
+
+**Pas de limite technique stricte**, mais privilégiez des fichiers < 10 MB pour de meilleures performances.
+
+### Autres limites
+
+- **Rate limits Batch** : L'application respecte automatiquement les limites (pause de 1 sec entre batches)
+- **Export API** : Maximum 5 exports par heure (limite Batch)
+- **Mémoire navigateur** : Sur des bases > 5 millions de profils, le téléchargement du fichier d'export peut saturer la mémoire
 
 ## 🚀 Installation et utilisation en LOCAL
 
