@@ -2,9 +2,13 @@
 
 Un outil web simple et intuitif pour importer en masse des contacts dans Batch à partir d'un fichier CSV, sans utiliser Postman.
 
-## Démo
+## ⚠️ AVERTISSEMENT SÉCURITÉ
 
-**[Essayer l'application](https://mickaelbentz.github.io/batch-profile-uploader/)** *(à venir)*
+**⚠️ Cette application doit être utilisée UNIQUEMENT en local (localhost).**
+
+**Ne jamais déployer cette application sur un serveur public ou GitHub Pages** car elle nécessite l'utilisation de votre REST API Key Batch qui doit rester strictement confidentielle.
+
+Les clés API Batch donnent accès à l'intégralité de vos données - leur exposition publique représenterait un risque de sécurité majeur.
 
 ## Pourquoi cet outil ?
 
@@ -215,15 +219,41 @@ L'API Batch peut retourner un succès partiel (code 202) avec des erreurs sur ce
 - **Rate limits Batch** : L'application respecte automatiquement les limites
 - **Taille fichier** : Pas de limite technique mais privilégiez < 5 MB pour de meilleures performances
 
-## Installation locale
+## 🚀 Installation et utilisation en LOCAL
+
+### Méthode 1: Serveur HTTP avec Python (Recommandé)
 
 ```bash
 git clone https://github.com/mickaelbentz/batch-profile-uploader.git
 cd batch-profile-uploader
-open index.html
+
+# Lancer un serveur HTTP local
+python3 -m http.server 8080
+
+# Ouvrir dans le navigateur
+# http://localhost:8080
 ```
 
-Aucune dépendance, aucun build. Fonctionne directement dans le navigateur!
+### Méthode 2: Node.js
+
+```bash
+# Avec npx (pas besoin d'installer)
+npx http-server -p 8080
+
+# Ou installer globalement
+npm install -g http-server
+http-server -p 8080
+```
+
+### Méthode 3: Fichier direct (peut avoir des limitations CORS)
+
+```bash
+open index.html  # macOS
+# ou
+start index.html # Windows
+```
+
+**Note**: Certains navigateurs bloquent les requêtes API depuis `file://`. Privilégiez un serveur HTTP local.
 
 ## Roadmap
 

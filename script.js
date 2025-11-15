@@ -34,26 +34,6 @@ const stepReport = document.getElementById('step-report');
 const reportCards = document.getElementById('report-cards');
 const reportDetails = document.getElementById('report-details');
 const resetBtn = document.getElementById('reset-btn');
-const toggleLogsBtn = document.getElementById('toggle-logs-btn');
-const logsContent = document.getElementById('logs-content');
-const technicalLogsText = document.getElementById('technical-logs-text');
-
-// Stockage des logs techniques
-let importLogs = [];
-
-function addLog(message, type = 'info') {
-    const timestamp = new Date().toISOString();
-    importLogs.push({ timestamp, type, message });
-    console.log(`[${type.toUpperCase()}] ${message}`);
-}
-
-// Toggle logs techniques
-toggleLogsBtn.addEventListener('click', () => {
-    logsContent.classList.toggle('hidden');
-    toggleLogsBtn.textContent = logsContent.classList.contains('hidden')
-        ? '📋 Afficher les logs techniques'
-        : '📋 Masquer les logs techniques';
-});
 
 // Fonction pour afficher les logs de debug
 function showDebugLog(logData) {
@@ -212,10 +192,14 @@ async function pollExportStatus(exportId, maxAttempts = 60) {
 }
 
 async function downloadAndProcessExport(exportData) {
+    console.log('Export data reçue:', exportData);
+
     // L'export peut contenir plusieurs fichiers
     if (!exportData.files || exportData.files.length === 0) {
         throw new Error('Aucun fichier d\'export disponible');
     }
+
+    console.log(`Traitement de ${exportData.files.length} fichier(s) d'export`);
 
     for (const file of exportData.files) {
         const response = await fetch(file.url);
@@ -241,6 +225,8 @@ async function downloadAndProcessExport(exportData) {
             }
         }
     }
+
+    console.log(`✓ ${existingProfiles.size} profils chargés dans la Map`);
 }
 
 function sleep(ms) {
@@ -283,6 +269,8 @@ fileInput.addEventListener('change', (e) => {
     if (file) {
         handleFileSelect(file);
     }
+    // Reset pour permettre de sélectionner le même fichier à nouveau
+    e.target.value = '';
 });
 
 function handleFileSelect(file) {
@@ -460,10 +448,6 @@ startImportBtn.addEventListener('click', async () => {
 });
 
 async function performImport(overwrite) {
-    importLogs = []; // Reset logs
-    addLog(`Début de l'importation - Mode: ${overwrite ? 'Écrasement' : 'Fusion'}`, 'info');
-    addLog(`Nombre de profils à traiter: ${csvData.length}`, 'info');
-
     const results = {
         created: 0,
         updated: 0,
@@ -668,11 +652,6 @@ function displayResults(results) {
     });
 
     reportDetails.innerHTML = detailsHTML;
-
-    // Afficher les logs techniques
-    technicalLogsText.textContent = importLogs.map(log =>
-        `[${log.timestamp}] [${log.type.toUpperCase()}] ${log.message}`
-    ).join('\n');
 }
 
 // Reset
