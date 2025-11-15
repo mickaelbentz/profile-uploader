@@ -329,17 +329,19 @@ L'application affiche des **logs de debug** uniquement en cas d'erreur :
 
 ### Méthode rapide : Scripts de démarrage automatique
 
-**Sur Mac/Linux :**
+**Sur Mac :**
+- Double-cliquez sur **`start.command`**
+- (Au premier lancement : clic droit → "Ouvrir" pour autoriser)
+
+**Sur Linux :**
 ```bash
 ./start.sh
 ```
 
 **Sur Windows :**
-```bash
-start.bat
-```
+- Double-cliquez sur **`start.bat`**
 
-Double-cliquez simplement sur le fichier correspondant et votre navigateur s'ouvrira automatiquement sur `http://localhost:8080`
+Le navigateur s'ouvrira automatiquement sur `http://localhost:8080`
 
 ### Méthode 1: Serveur HTTP avec Python (Recommandé)
 
