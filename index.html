@@ -13,6 +13,14 @@
             <p>Importez et synchronisez vos contacts avec Batch</p>
         </header>
 
+        <!-- Avertissement sécurité -->
+        <div class="security-warning">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-content">
+                <strong>SÉCURITÉ:</strong> Cette application doit être utilisée <strong>UNIQUEMENT en local (localhost)</strong> pour protéger les clés API.
+            </div>
+        </div>
+
         <!-- Étape 1: Configuration API -->
         <div class="step-section" id="step-config">
             <div class="step-header">
@@ -106,15 +114,6 @@
             <div class="report-cards" id="report-cards"></div>
 
             <div class="report-details" id="report-details"></div>
-
-            <div class="technical-logs">
-                <button class="btn-toggle-logs" id="toggle-logs-btn">
-                    📋 Afficher les logs techniques
-                </button>
-                <div class="logs-content hidden" id="logs-content">
-                    <pre id="technical-logs-text"></pre>
-                </div>
-            </div>
 
             <button class="btn-secondary" id="reset-btn">
                 Nouvelle importation
