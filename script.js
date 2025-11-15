@@ -153,7 +153,7 @@ async function requestProfilesExport() {
     return data.id;
 }
 
-async function pollExportStatus(exportId, maxAttempts = 60) {
+async function pollExportStatus(exportId, maxAttempts = 360) {
     for (let i = 0; i < maxAttempts; i++) {
         await sleep(5000); // Attendre 5 secondes entre chaque vérification
 
@@ -185,10 +185,17 @@ async function pollExportStatus(exportId, maxAttempts = 60) {
             throw new Error(`L'export a échoué: ${JSON.stringify(data)}`);
         }
 
-        loaderMessage.textContent = `Export en cours (${data.status})... (tentative ${i + 1}/${maxAttempts})`;
+        // Calcul du temps écoulé
+        const elapsedMinutes = Math.floor((i + 1) * 5 / 60);
+        const elapsedSeconds = ((i + 1) * 5) % 60;
+        const timeString = elapsedMinutes > 0
+            ? `${elapsedMinutes} min ${elapsedSeconds} sec`
+            : `${elapsedSeconds} sec`;
+
+        loaderMessage.textContent = `Export en cours... Temps écoulé: ${timeString} (sur grosses bases, cela peut prendre jusqu'à 30 min)`;
     }
 
-    throw new Error('Timeout: l\'export a pris trop de temps');
+    throw new Error('Timeout: l\'export a pris plus de 30 minutes. Votre base est peut-être trop volumineuse.');
 }
 
 async function downloadAndProcessExport(exportData) {
