@@ -323,6 +323,24 @@ L'application affiche des **logs de debug** uniquement en cas d'erreur :
 
 ## 🚀 Installation et utilisation en LOCAL
 
+### 📖 Guide utilisateur simple
+
+**Pour les utilisateurs non techniques**, consultez le **[Guide de démarrage rapide (GUIDE_UTILISATEUR.md)](GUIDE_UTILISATEUR.md)** qui explique tout en 5 minutes.
+
+### Méthode rapide : Scripts de démarrage automatique
+
+**Sur Mac/Linux :**
+```bash
+./start.sh
+```
+
+**Sur Windows :**
+```bash
+start.bat
+```
+
+Double-cliquez simplement sur le fichier correspondant et votre navigateur s'ouvrira automatiquement sur `http://localhost:8080`
+
 ### Méthode 1: Serveur HTTP avec Python (Recommandé)
 
 ```bash
@@ -356,6 +374,19 @@ start index.html # Windows
 ```
 
 **Note**: Certains navigateurs bloquent les requêtes API depuis `file://`. Privilégiez un serveur HTTP local.
+
+---
+
+## 📦 Partager l'application avec des collègues
+
+Pour permettre à tes collègues d'utiliser l'application :
+
+1. **Partage le lien du repository GitHub** : https://github.com/mickaelbentz/batch-profile-uploader
+2. Demande-leur de télécharger le ZIP (bouton vert "Code" → "Download ZIP")
+3. Ils décompressent et lancent `start.sh` (Mac/Linux) ou `start.bat` (Windows)
+4. Partage-leur le **[Guide utilisateur (GUIDE_UTILISATEUR.md)](GUIDE_UTILISATEUR.md)**
+
+**⚠️ Important** : Chaque utilisateur doit lancer l'application **sur son propre ordinateur en local**. Ne jamais déployer sur un serveur public.
 
 ## Roadmap
 
