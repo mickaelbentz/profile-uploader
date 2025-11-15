@@ -153,27 +153,72 @@ pierre.martin@example.com,Pierre,Martin,fr,FR,180,true
 
 ## API Batch utilisées
 
-L'application utilise ces endpoints de l'API Batch:
+L'application utilise l'**API Batch v2.8** avec les endpoints suivants:
 
-### 1. Export des profils
+### 1. Export des profils existants
+
+**Création de l'export :**
 ```
-POST https://api.batch.com/2.7/profiles/export
-GET https://api.batch.com/2.7/profiles/export/{exportId}
+POST https://api.batch.com/2.8/profiles/export
 ```
-**Limite** : 5 requêtes par heure (12 minutes entre chaque)
+
+Body de la requête :
+```json
+{
+  "export_type": "ATTRIBUTES",
+  "attributes": ["$email_address"],
+  "identifiers": ["custom_id"]
+}
+```
+
+**Vérification du statut de l'export :**
+```
+GET https://api.batch.com/2.8/exports/view?id={exportId}
+```
+
+L'application utilise un **polling** toutes les 5 secondes jusqu'à ce que le statut soit `SUCCESS` ou `done`.
+
+**Limite** : 5 requêtes d'export par heure (12 minutes entre chaque)
 
 ### 2. Mise à jour des profils
 ```
-POST https://api.batch.com/2.7/profiles/update
+POST https://api.batch.com/2.8/profiles/update
 ```
-**Limite** : 200 profils par requête, 300 updates/seconde, burst 1000
 
-### Authentification
-
+Body de la requête :
+```json
+[
+  {
+    "custom_id": "abc123...",
+    "overwrite": false,
+    "attributes": {
+      "$email_address": "user@example.com",
+      "firstname": "John",
+      "custom_attr": "value"
+    }
+  }
+]
 ```
-Authorization: Bearer YOUR_API_KEY
+
+**Limites** :
+- 200 profils maximum par requête
+- 300 updates/seconde
+- Burst de 1000 requêtes
+
+L'application envoie les profils par **batches de 200** avec une pause de 1 seconde entre chaque batch pour respecter les rate limits.
+
+### 3. Authentification
+
+Tous les appels API utilisent ces headers :
+```
+Authorization: Bearer YOUR_REST_API_KEY
 X-Batch-Project: YOUR_PROJECT_ID
+Content-Type: application/json
 ```
+
+**Format des credentials :**
+- REST API Key : doit commencer par `rest_`
+- Project ID : doit commencer par `project_`
 
 ## Sécurité
 
@@ -204,13 +249,70 @@ L'API Batch peut retourner un succès partiel (code 202) avec des erreurs sur ce
 - Quels profils ont été traités avec succès
 - Quels profils ont échoué et pourquoi
 
-## Technologies
+## Architecture technique
 
-- **HTML5** - Structure sémantique
-- **CSS3** - Design Batch.com (Inter font, #0968AC)
-- **JavaScript Vanilla** - Logique côté client
-- **Web Crypto API** - Hash SHA-256 pour les custom IDs
-- **Batch Profiles API** - Export et mise à jour
+### Technologies
+
+- **HTML5** - Structure sémantique avec 4 étapes progressives
+- **CSS3** - Design Batch.com (Inter font, couleur primaire #0968AC)
+- **JavaScript Vanilla** - Logique côté client, aucune dépendance externe
+- **Web Crypto API** - Hash SHA-256 pour générer les custom IDs
+- **Batch Profiles API v2.8** - Export et mise à jour des profils
+
+### Fonctionnement interne
+
+L'application suit un workflow en **4 étapes** :
+
+#### Étape 1 : Configuration API et chargement des profils existants
+
+1. **Validation des credentials** : Vérification du format de l'API Key (`rest_*`) et du Project ID (`project_*`)
+2. **Création de l'export** via `POST /profiles/export` avec `export_type: 'ATTRIBUTES'`
+3. **Polling du statut** toutes les 5 secondes sur `GET /exports/view?id={exportId}`
+4. **Téléchargement du fichier NDJSON** (Newline Delimited JSON) depuis l'URL fournie
+5. **Construction d'une Map** en mémoire : `email → custom_id` pour identifier rapidement les profils existants
+6. **Logging console** : Affichage du nombre de profils chargés pour debug
+
+#### Étape 2 : Upload et parsing du CSV
+
+1. **Upload du fichier** via drag & drop ou sélection manuelle
+2. **Reset de l'input** après sélection pour permettre de choisir un autre fichier
+3. **Parsing CSV** ligne par ligne avec détection automatique des séparateurs (`,` ou `;`)
+4. **Stockage** des données en mémoire dans `csvData` et des en-têtes dans `csvHeaders`
+
+#### Étape 3 : Validation des champs
+
+1. **Détection des attributs natifs** : Vérification si les colonnes correspondent aux attributs Batch (`$email_address`, `$language`, etc.)
+2. **Validation des attributs custom** : Vérification du format (lettres, chiffres, underscore, max 30 caractères)
+3. **Interface de validation** : Affichage visuel avec badges de statut (Email, Natif, Valide, Warning)
+4. **Choix de la stratégie** : Checkboxes exclusives pour Fusionner ou Écraser
+
+#### Étape 4 : Import et rapport
+
+**Préparation des profils :**
+- Pour chaque ligne du CSV, extraction de l'email
+- Si l'email existe dans la Map → utilisation du `custom_id` existant (profil mis à jour)
+- Si l'email n'existe pas → génération d'un `custom_id` via SHA-256 de l'email (nouveau profil)
+- Construction de l'objet avec `custom_id`, `overwrite` (boolean), et `attributes`
+
+**Envoi par batches :**
+- Division des profils en groupes de **200 maximum**
+- Envoi séquentiel avec `POST /profiles/update`
+- Pause de **1 seconde** entre chaque batch pour respecter les rate limits
+- Gestion des erreurs partielles (code 202 avec tableau `errors`)
+
+**Génération du rapport :**
+- Cartes récapitulatives : Nombre de profils créés, mis à jour, erreurs
+- Liste détaillée : Email, statut (success/error), message pour chaque ligne
+- Différenciation visuelle avec bordures colorées (vert pour succès, rouge pour erreur)
+
+### Gestion des erreurs
+
+L'application affiche des **logs de debug** uniquement en cas d'erreur :
+
+- **Bloc jaune** (`.debug-logs`) avec détails techniques (timestamp, format des credentials, URL de la requête)
+- **Masquage automatique** si tout fonctionne correctement
+- **Logging console** pour tracer le flux d'exécution (polling, parsing, profils chargés)
+- **Messages d'erreur explicites** : HTTP status, body JSON, messages Batch API
 
 ## Limites et contraintes
 
