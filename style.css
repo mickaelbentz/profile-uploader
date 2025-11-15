@@ -44,9 +44,6 @@ header p {
 
 /* Security warning */
 .security-warning {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
     padding: 20px;
     margin-bottom: 40px;
     background: #FEF3C7;
@@ -54,13 +51,7 @@ header p {
     border-radius: 12px;
 }
 
-.warning-icon {
-    font-size: 32px;
-    flex-shrink: 0;
-}
-
 .warning-content {
-    flex: 1;
     font-size: 15px;
     line-height: 1.6;
     color: #0F0F0F;
