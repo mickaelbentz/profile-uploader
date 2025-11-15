@@ -456,8 +456,7 @@ startImportBtn.addEventListener('click', async () => {
 
 async function performImport(overwrite) {
     const results = {
-        created: 0,
-        updated: 0,
+        success: 0,
         errors: 0,
         details: []
     };
@@ -489,23 +488,12 @@ async function performImport(overwrite) {
                 // Analyser la réponse
                 profiles.forEach((profile, index) => {
                     const email = profile.email; // On a stocké l'email temporairement
-                    const isNew = !existingProfiles.has(email.toLowerCase());
-
-                    if (isNew) {
-                        results.created++;
-                        results.details.push({
-                            email,
-                            status: 'success',
-                            message: 'Profil créé'
-                        });
-                    } else {
-                        results.updated++;
-                        results.details.push({
-                            email,
-                            status: 'success',
-                            message: 'Profil mis à jour'
-                        });
-                    }
+                    results.success++;
+                    results.details.push({
+                        email,
+                        status: 'success',
+                        message: 'Traité avec succès'
+                    });
                 });
 
                 // Gérer les erreurs partielles
@@ -629,20 +617,16 @@ function displayResults(results) {
     // Cartes de résumé
     reportCards.innerHTML = `
         <div class="report-card success">
-            <div class="report-card-value">${results.created}</div>
-            <div class="report-card-label">Profils créés</div>
-        </div>
-        <div class="report-card success">
-            <div class="report-card-value">${results.updated}</div>
-            <div class="report-card-label">Profils mis à jour</div>
+            <div class="report-card-value">${results.success}</div>
+            <div class="report-card-label">Profils traités avec succès</div>
         </div>
         <div class="report-card error">
             <div class="report-card-value">${results.errors}</div>
             <div class="report-card-label">Erreurs</div>
         </div>
         <div class="report-card">
-            <div class="report-card-value">${results.created + results.updated + results.errors}</div>
-            <div class="report-card-label">Total traités</div>
+            <div class="report-card-value">${results.success + results.errors}</div>
+            <div class="report-card-label">Total</div>
         </div>
     `;
 
