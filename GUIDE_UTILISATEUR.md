@@ -44,22 +44,21 @@ cd batch-profile-uploader
 
 ### Sur Mac
 
-**Méthode simple (double-clic) :**
+**Méthode recommandée :**
 
-1. Double-clique sur le fichier **`start.command`**
-2. Si tu vois un message "impossible d'ouvrir car provenant d'un développeur non identifié" :
-   - Clic droit sur `start.command`
-   - Sélectionne **"Ouvrir"**
-   - Clique sur **"Ouvrir"** dans la fenêtre de confirmation
+1. **Clic droit** sur le fichier **`start.sh`**
+2. Sélectionne **"Ouvrir avec"** → **"Terminal"** (ou "Terminal.app")
 3. Ton navigateur s'ouvrira automatiquement sur `http://localhost:8080`
 4. C'est prêt ! 🎉
 
-**Méthode alternative (terminal) :**
-```bash
-# Ouvre un terminal dans le dossier, puis :
-chmod +x start.sh
-./start.sh
-```
+**Méthode alternative (via Terminal) :**
+
+1. Ouvre **Terminal** (Applications → Utilitaires → Terminal)
+2. Tape `cd ` (avec un espace après)
+3. **Glisse-dépose** le dossier `batch-profile-uploader` dans la fenêtre Terminal
+4. Appuie sur **Entrée**
+5. Tape : `./start.sh`
+6. Appuie sur **Entrée**
 
 ### Sur Linux
 

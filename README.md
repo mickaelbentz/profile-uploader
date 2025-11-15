@@ -330,8 +330,7 @@ L'application affiche des **logs de debug** uniquement en cas d'erreur :
 ### Méthode rapide : Scripts de démarrage automatique
 
 **Sur Mac :**
-- Double-cliquez sur **`start.command`**
-- (Au premier lancement : clic droit → "Ouvrir" pour autoriser)
+- Clic droit sur **`start.sh`** → "Ouvrir avec" → "Terminal"
 
 **Sur Linux :**
 ```bash
