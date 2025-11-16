@@ -118,9 +118,21 @@
 
             <div class="report-details" id="report-details"></div>
 
-            <button class="btn-secondary" id="reset-btn">
-                Nouvelle importation
-            </button>
+            <div style="display: flex; gap: 16px; margin-top: 24px;">
+                <button class="btn-primary" id="export-imported-btn" style="flex: 1;">
+                    📥 Exporter les profils importés (CSV)
+                </button>
+                <button class="btn-secondary" id="reset-btn" style="flex: 1;">
+                    🔄 Nouvelle importation
+                </button>
+            </div>
+
+            <p id="export-info" style="margin-top: 12px; font-size: 14px; color: #444649; text-align: center;"></p>
+
+            <div class="loader hidden" id="export-profiles-loader">
+                <div class="loader-spinner"></div>
+                <p id="export-profiles-message">Export en cours...</p>
+            </div>
         </div>
     </div>
 

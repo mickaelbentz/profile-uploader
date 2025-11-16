@@ -4,6 +4,8 @@ let projectId = '';
 let existingProfiles = new Map(); // Map: email -> custom_id
 let csvData = [];
 let csvHeaders = [];
+let currentFileName = '';
+let currentImportId = '';
 
 // Éléments DOM
 const apiKeyInput = document.getElementById('api-key');
@@ -34,6 +36,10 @@ const stepReport = document.getElementById('step-report');
 const reportCards = document.getElementById('report-cards');
 const reportDetails = document.getElementById('report-details');
 const resetBtn = document.getElementById('reset-btn');
+const exportImportedBtn = document.getElementById('export-imported-btn');
+const exportInfo = document.getElementById('export-info');
+const exportProfilesLoader = document.getElementById('export-profiles-loader');
+const exportProfilesMessage = document.getElementById('export-profiles-message');
 
 // Fonction pour afficher les logs de debug
 function showDebugLog(logData) {
@@ -289,6 +295,13 @@ function handleFileSelect(file) {
 
     // Stocker le fichier pour parsing
     window.selectedFile = file;
+
+    // Stocker le nom du fichier et générer l'importID
+    currentFileName = file.name;
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
+    currentImportId = `${currentFileName}_${dateStr}`;
+
+    console.log('ImportID généré:', currentImportId);
 }
 
 function resetFileUpload() {
@@ -574,6 +587,9 @@ async function prepareProfile(row, overwrite) {
         }
     });
 
+    // Ajouter l'importID pour pouvoir exporter ces profils plus tard
+    attributes.importID = currentImportId;
+
     return {
         email, // Pour le rapport
         identifiers: {
@@ -643,9 +659,147 @@ function displayResults(results) {
     });
 
     reportDetails.innerHTML = detailsHTML;
+
+    // Afficher l'importID pour l'export
+    exportInfo.textContent = `ImportID: ${currentImportId}`;
 }
 
 // Reset
 resetBtn.addEventListener('click', () => {
     location.reload();
 });
+
+// === EXPORT DES PROFILS IMPORTÉS ===
+
+exportImportedBtn.addEventListener('click', async () => {
+    if (!currentImportId) {
+        alert('Aucun import en cours');
+        return;
+    }
+
+    exportImportedBtn.disabled = true;
+    exportProfilesLoader.classList.remove('hidden');
+    exportProfilesMessage.textContent = 'Demande d\'export en cours...';
+
+    try {
+        // Étape 1: Créer un export complet
+        exportProfilesMessage.textContent = 'Création de l\'export...';
+        const exportId = await requestProfilesExport();
+
+        exportProfilesMessage.textContent = 'Export en cours, polling du statut...';
+        const exportData = await pollExportStatus(exportId);
+
+        exportProfilesMessage.textContent = 'Téléchargement et filtrage des données...';
+        const filteredProfiles = await downloadAndFilterExport(exportData, currentImportId);
+
+        exportProfilesMessage.textContent = 'Conversion en CSV...';
+        const csvContent = convertToCSV(filteredProfiles);
+
+        // Télécharger le fichier CSV
+        downloadCSV(csvContent, `export_${currentImportId}.csv`);
+
+        exportProfilesLoader.classList.add('hidden');
+        exportInfo.textContent = `✓ ${filteredProfiles.length} profils exportés ! ImportID: ${currentImportId}`;
+
+    } catch (error) {
+        exportProfilesLoader.classList.add('hidden');
+        exportInfo.textContent = `❌ Erreur lors de l'export: ${error.message}`;
+        console.error('Erreur export:', error);
+    } finally {
+        exportImportedBtn.disabled = false;
+    }
+});
+
+async function downloadAndFilterExport(exportData, targetImportId) {
+    if (!exportData.files || exportData.files.length === 0) {
+        throw new Error('Aucun fichier d\'export disponible');
+    }
+
+    const filteredProfiles = [];
+
+    for (const file of exportData.files) {
+        const response = await fetch(file.url);
+        const text = await response.text();
+
+        // Parser le NDJSON ligne par ligne
+        const lines = text.trim().split('\n');
+
+        for (const line of lines) {
+            try {
+                const profile = JSON.parse(line);
+
+                // Filtrer sur l'importID
+                if (profile.attributes?.importID === targetImportId) {
+                    filteredProfiles.push(profile);
+                }
+            } catch (e) {
+                console.warn('Ligne JSON invalide:', line);
+            }
+        }
+    }
+
+    console.log(`✓ ${filteredProfiles.length} profils filtrés avec importID = ${targetImportId}`);
+    return filteredProfiles;
+}
+
+function convertToCSV(profiles) {
+    if (profiles.length === 0) {
+        return 'Aucun profil trouvé avec cet importID';
+    }
+
+    // Collecter tous les attributs possibles
+    const allAttributes = new Set();
+    profiles.forEach(profile => {
+        if (profile.attributes) {
+            Object.keys(profile.attributes).forEach(key => allAttributes.add(key));
+        }
+    });
+
+    // Créer l'en-tête CSV : custom_id + tous les attributs
+    const headers = ['custom_id', ...Array.from(allAttributes).sort()];
+    let csv = headers.join(',') + '\n';
+
+    // Ajouter chaque profil
+    profiles.forEach(profile => {
+        const row = [];
+
+        // custom_id
+        row.push(profile.identifiers?.custom_id || '');
+
+        // Attributs
+        Array.from(allAttributes).sort().forEach(attr => {
+            const value = profile.attributes?.[attr];
+            // Échapper les valeurs contenant des virgules ou guillemets
+            if (value !== undefined && value !== null) {
+                const strValue = String(value);
+                if (strValue.includes(',') || strValue.includes('"') || strValue.includes('\n')) {
+                    row.push(`"${strValue.replace(/"/g, '""')}"`);
+                } else {
+                    row.push(strValue);
+                }
+            } else {
+                row.push('');
+            }
+        });
+
+        csv += row.join(',') + '\n';
+    });
+
+    return csv;
+}
+
+function downloadCSV(csvContent, filename) {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    console.log(`✓ Fichier CSV téléchargé: ${filename}`);
+}
