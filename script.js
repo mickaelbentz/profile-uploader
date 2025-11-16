@@ -587,8 +587,8 @@ async function prepareProfile(row, overwrite) {
         }
     });
 
-    // Ajouter l'importID pour pouvoir exporter ces profils plus tard
-    attributes.importID = currentImportId;
+    // Ajouter l'import_id pour pouvoir exporter ces profils plus tard
+    attributes.import_id = currentImportId;
 
     return {
         email, // Pour le rapport
@@ -728,8 +728,8 @@ async function downloadAndFilterExport(exportData, targetImportId) {
             try {
                 const profile = JSON.parse(line);
 
-                // Filtrer sur l'importID
-                if (profile.attributes?.importID === targetImportId) {
+                // Filtrer sur l'import_id
+                if (profile.attributes?.import_id === targetImportId) {
                     filteredProfiles.push(profile);
                 }
             } catch (e) {
@@ -738,7 +738,7 @@ async function downloadAndFilterExport(exportData, targetImportId) {
         }
     }
 
-    console.log(`✓ ${filteredProfiles.length} profils filtrés avec importID = ${targetImportId}`);
+    console.log(`✓ ${filteredProfiles.length} profils filtrés avec import_id = ${targetImportId}`);
     return filteredProfiles;
 }
 
