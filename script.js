@@ -718,6 +718,10 @@ async function downloadAndFilterExport(exportData, targetImportId) {
     }
 
     const filteredProfiles = [];
+    let totalProfiles = 0;
+    let profilesWithImportId = 0;
+
+    console.log('🔍 Recherche de profils avec import_id =', targetImportId);
 
     for (const file of exportData.files) {
         const response = await fetch(file.url);
@@ -729,9 +733,17 @@ async function downloadAndFilterExport(exportData, targetImportId) {
         for (const line of lines) {
             try {
                 const profile = JSON.parse(line);
+                totalProfiles++;
+
+                // Log pour debug : afficher l'import_id de chaque profil
+                if (profile.attributes?.import_id) {
+                    profilesWithImportId++;
+                    console.log(`  Profil ${totalProfiles}: import_id = "${profile.attributes.import_id}"`);
+                }
 
                 // Filtrer sur l'import_id
                 if (profile.attributes?.import_id === targetImportId) {
+                    console.log(`  ✓ Match trouvé !`);
                     filteredProfiles.push(profile);
                 }
             } catch (e) {
@@ -740,7 +752,9 @@ async function downloadAndFilterExport(exportData, targetImportId) {
         }
     }
 
-    console.log(`✓ ${filteredProfiles.length} profils filtrés avec import_id = ${targetImportId}`);
+    console.log(`📊 Total profils exportés: ${totalProfiles}`);
+    console.log(`📊 Profils avec import_id: ${profilesWithImportId}`);
+    console.log(`✓ ${filteredProfiles.length} profils filtrés avec import_id = "${targetImportId}"`);
     return filteredProfiles;
 }
 
