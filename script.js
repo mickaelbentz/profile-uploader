@@ -296,12 +296,14 @@ function handleFileSelect(file) {
     // Stocker le fichier pour parsing
     window.selectedFile = file;
 
-    // Stocker le nom du fichier et générer l'importID
+    // Stocker le nom du fichier et générer l'import_id
     currentFileName = file.name;
+    // Retirer l'extension .csv et remplacer caractères non valides
+    const cleanFileName = file.name.replace(/\.csv$/i, '').replace(/[^a-z0-9_]/gi, '_');
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
-    currentImportId = `${currentFileName}_${dateStr}`;
+    currentImportId = `${cleanFileName}_${dateStr}`;
 
-    console.log('ImportID généré:', currentImportId);
+    console.log('Import ID généré:', currentImportId);
 }
 
 function resetFileUpload() {
