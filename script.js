@@ -40,6 +40,8 @@ const exportImportedBtn = document.getElementById('export-imported-btn');
 const exportInfo = document.getElementById('export-info');
 const exportProfilesLoader = document.getElementById('export-profiles-loader');
 const exportProfilesMessage = document.getElementById('export-profiles-message');
+const exportDebugLogs = document.getElementById('export-debug-logs');
+const exportDebugContent = document.getElementById('export-debug-content');
 
 // Fonction pour afficher les logs de debug
 function showDebugLog(logData) {
@@ -681,6 +683,8 @@ exportImportedBtn.addEventListener('click', async () => {
 
     exportImportedBtn.disabled = true;
     exportProfilesLoader.classList.remove('hidden');
+    exportDebugLogs.classList.add('hidden');
+    exportDebugContent.textContent = '';
     exportProfilesMessage.textContent = 'Demande d\'export en cours...';
 
     try {
@@ -692,16 +696,20 @@ exportImportedBtn.addEventListener('click', async () => {
         const exportData = await pollExportStatus(exportId);
 
         exportProfilesMessage.textContent = 'Téléchargement et filtrage des données...';
-        const filteredProfiles = await downloadAndFilterExport(exportData, currentImportId);
+        const result = await downloadAndFilterExport(exportData, currentImportId);
+
+        // Afficher les logs de debug
+        exportDebugLogs.classList.remove('hidden');
+        exportDebugContent.textContent = result.logs.join('\n');
 
         exportProfilesMessage.textContent = 'Conversion en CSV...';
-        const csvContent = convertToCSV(filteredProfiles);
+        const csvContent = convertToCSV(result.profiles);
 
         // Télécharger le fichier CSV
         downloadCSV(csvContent, `export_${currentImportId}.csv`);
 
         exportProfilesLoader.classList.add('hidden');
-        exportInfo.textContent = `✓ ${filteredProfiles.length} profils exportés ! ImportID: ${currentImportId}`;
+        exportInfo.textContent = `✓ ${result.profiles.length} profils exportés ! ImportID: ${currentImportId}`;
 
     } catch (error) {
         exportProfilesLoader.classList.add('hidden');
@@ -718,10 +726,12 @@ async function downloadAndFilterExport(exportData, targetImportId) {
     }
 
     const filteredProfiles = [];
+    const logs = [];
     let totalProfiles = 0;
     let profilesWithImportId = 0;
 
-    console.log('🔍 Recherche de profils avec import_id =', targetImportId);
+    logs.push(`🔍 Recherche de profils avec import_id = "${targetImportId}"`);
+    logs.push('');
 
     for (const file of exportData.files) {
         const response = await fetch(file.url);
@@ -738,24 +748,32 @@ async function downloadAndFilterExport(exportData, targetImportId) {
                 // Log pour debug : afficher l'import_id de chaque profil
                 if (profile.attributes?.import_id) {
                     profilesWithImportId++;
-                    console.log(`  Profil ${totalProfiles}: import_id = "${profile.attributes.import_id}"`);
-                }
+                    const email = profile.attributes?.$email_address || 'no email';
+                    logs.push(`  Profil #${totalProfiles} (${email}): import_id = "${profile.attributes.import_id}"`);
 
-                // Filtrer sur l'import_id
-                if (profile.attributes?.import_id === targetImportId) {
-                    console.log(`  ✓ Match trouvé !`);
-                    filteredProfiles.push(profile);
+                    // Filtrer sur l'import_id
+                    if (profile.attributes.import_id === targetImportId) {
+                        logs.push(`    ✓ MATCH TROUVÉ !`);
+                        filteredProfiles.push(profile);
+                    }
                 }
             } catch (e) {
-                console.warn('Ligne JSON invalide:', line);
+                logs.push(`  ⚠️ Ligne JSON invalide`);
             }
         }
     }
 
-    console.log(`📊 Total profils exportés: ${totalProfiles}`);
-    console.log(`📊 Profils avec import_id: ${profilesWithImportId}`);
-    console.log(`✓ ${filteredProfiles.length} profils filtrés avec import_id = "${targetImportId}"`);
-    return filteredProfiles;
+    logs.push('');
+    logs.push(`📊 Total profils exportés: ${totalProfiles}`);
+    logs.push(`📊 Profils avec import_id: ${profilesWithImportId}`);
+    logs.push(`✅ ${filteredProfiles.length} profils filtrés avec import_id = "${targetImportId}"`);
+
+    console.log(logs.join('\n'));
+
+    return {
+        profiles: filteredProfiles,
+        logs: logs
+    };
 }
 
 function convertToCSV(profiles) {
